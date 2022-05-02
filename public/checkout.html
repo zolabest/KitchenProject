@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <title>Kitchen Story</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        var cart;
+
+        function getCart() {
+            const searchFor = $("#searchFor").val();
+            const url = "checkoutCart";
+            $.get(url, (content) => {
+                console.log("Content", content);
+                cart = content;
+
+                showCart();
+            });
+        }
+
+        function showCart() {
+            let content = "";
+            let total = 0;
+            for (let i in cart) {
+                const row = cart[i];
+                console.log("ROW: ", row);
+                console.log("QTY", row.qty);
+                const qty = parseInt(row.qty);
+                let tr = `<tr><td>${row.id}</td><td>${row.description}</td><td>${row.price}</td><td>${row.qty}<td></tr>`;
+                content += tr;
+                total += (row.price * row.qty);
+            }
+            //  console.log(content);
+            $("#tbodyId").html(content);
+            $("#spanTotal").html("Total due: $" + total);
+        }
+
+        function order(idx) {
+            const qty = prompt("Quantity: ");
+            const item = {
+                id: products[idx].id,
+                qty: qty
+            };
+            $.post("addProduct", item, (resp) => {
+                console.log(resp);
+                alert(resp.message);
+            });
+        }
+    </script>
+</head>
+
+<body onload="getCart()">
+    <h1>Kitchen Story</h1>
+    <p>
+        <form method="post" action="pay">
+            <input type="text" id="creditCard" name="creditCard" />
+            <button>Pay</button>
+        </form>
+    </p>
+
+    <table id="cartTable" border="1">
+        <tr>
+            <th>ID</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Qty</th>
+        </tr>
+        <tbody id="tbodyId"></tbody>
+    </table>
+    <span id="spanTotal"></span>
+    <div id="divContent"></div>
+</body>
+
+</html>

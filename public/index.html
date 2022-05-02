@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <title>Kitchen Story</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        var products;
+
+        function getProducts() {
+            const searchFor = $("#searchFor").val();
+            const url = "products" + (searchFor ? "/" + searchFor : "");
+            $.get(url, (content) => {
+                console.log("Content", content);
+                products = content;
+                showProducts();
+            });
+        }
+
+        function showProducts() {
+            let content = "";
+            for (let i in products) {
+                const row = products[i];
+                console.log(row.description);
+                let tr = `<tr><td>${row.id}</td><td>${row.description}</td><td>${row.price}</td><td><a href='javascript:order(${i})'>Buy</a></tr>`;
+                content += tr;
+            }
+            //  console.log(content);
+            $("#tbodyId").html(content);
+        }
+
+        function order(idx) {
+            const qty = prompt("Quantity: ");
+            const item = {
+                id: products[idx].id,
+                qty: qty
+            };
+            $.post("addItem", item, (resp) => {
+                console.log(resp);
+                alert(resp.message);
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Kitchen Story</h1>
+    <p>
+        <input type="text" id="searchFor" />
+        <button onclick="getProducts()">Show Products</button>
+        <span id="spanCheckout"><a href='checkout'>Checkout</a></span>
+    </p>
+
+    <table id="productTable" border="1">
+        <tr>
+            <th>ID</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Buy?</th>
+        </tr>
+        <tbody id="tbodyId"></tbody>
+    </table>
+    <div id="divContent"></div>
+</body>
+
+</html>
